@@ -28,3 +28,5 @@ $ npm run dev
 - Add loading component
 - Change create and edit page to a modal for better user experience
 
+## Screen Shot
+![todo-result](./assets/images/screenshot.png?raw=true "Result")
