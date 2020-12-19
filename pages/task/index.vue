@@ -7,10 +7,18 @@
             >New Task</NuxtLink
           >
         </b-col>
+        <b-col md="3" offset-md="3" class="text-right">
+            <b-form-select 
+            v-model="filters.status" 
+            :options="statuses"
+            value-field="id"
+            text-field="name"
+            ></b-form-select>
+        </b-col>
       </b-row>
       </PageAction>
 
-    <b-table :items="tasks" :fields="fields" striped fixed responsive="sm">
+    <b-table :items="taskList" :fields="fields" striped fixed responsive="sm">
       <template #cell(actions)="row">
         <NuxtLink
           class="mr-2 btn btn-primary"
@@ -26,11 +34,16 @@
 </template>
 
 <script>
+import TaskStatusRepository from "@/repositories/TaskStatusRepository";
 import TaskRepository from "@/repositories/TaskRepository";
 
 export default {
   data() {
     return {
+      statuses: [],
+      filters: {
+        status: null
+      },
       fields: [
         {
           key: "title",
@@ -59,10 +72,26 @@ export default {
       tasks: [],
     };
   },
+  computed: {
+		taskList () {
+			return this.filters.status
+				? this.tasks.filter(task => task.status.id ===  this.filters.status)
+				: this.tasks
+    }
+  },
   created() {
+    this.fetchTaskStatusList();
     this.fetchTaskList();
   },
   methods: {
+    fetchTaskStatusList() {
+      TaskStatusRepository.list().then((response) => {
+        this.statuses = [
+          { id: null, name: 'Please select an option' },
+          ...response.data.data
+        ];
+      });
+    },
     fetchTaskList() {
       TaskRepository.list().then((response) => {
         this.tasks = response.data.data;
